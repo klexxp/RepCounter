@@ -44,14 +44,20 @@ public class FrameMatcher implements Runnable {
     private Thread mThisThread;
 
     private int mResult = 0;
-    private int mMinDistance = 10;
+    private double mMinDistance = 10;
     private int mMinMatches = 750;
 
-    public void initialize(MatcherManager manager, Mat primeFrame, Mat compareFrame){
-        mManager = manager;
+    public void initialize(MatcherManager manager, Mat primeFrame, Mat compareFrame, double minDist, int minMatch){
+        Log.d(LOG_TAG,"Frame matcher initializing.");
+
         mThisThread = Thread.currentThread();
+        mManager = manager;
 
         mCompareFrame = compareFrame;
+
+        if(Thread.interrupted()){
+            return;
+        }
 
         mKpPrime = Extractor.calcKeypoints(primeFrame);
         mPrimeDesc = Extractor.calcDescriptor(primeFrame, mKpPrime);
@@ -67,15 +73,21 @@ public class FrameMatcher implements Runnable {
             return;
         }
 
+        mMinDistance = minDist;
+        mMinMatches = minMatch;
+
         mMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+        Log.d(LOG_TAG,"Frame matcher initialized");
     }
 
     @Override
     public void run() {
+        Log.d(LOG_TAG,"Frame matcher running.");
         mFinalImage = null;
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
 
         if(Thread.interrupted()){
+            Log.d(LOG_TAG,"Frame matcher interrupted");
             return;
         }
 
@@ -84,6 +96,7 @@ public class FrameMatcher implements Runnable {
             mMatcher.match(mPrimeDesc, mCompareDesc, matches);
 
             if(Thread.interrupted()){
+                Log.d(LOG_TAG,"Frame matcher interrupted");
                 return;
             }
 
@@ -106,11 +119,13 @@ public class FrameMatcher implements Runnable {
             Log.e(LOG_TAG, "Out of Memory in matcher stage. Throttling.");
             java.lang.System.gc();
             if(Thread.interrupted()){
+                Log.d(LOG_TAG,"Frame matcher interrupted");
                 return;
             }
             try{
                 Thread.sleep(SLEEP_TIME_MILLISECONDS);
             }catch(java.lang.InterruptedException interruptException){
+                Log.d(LOG_TAG,"Frame matcher interrupted");
                 return;
             }
         }finally{
@@ -120,17 +135,20 @@ public class FrameMatcher implements Runnable {
         }
     }
 
-    private void  createBitmap(){
+    private void createBitmap(){
+        Log.d(LOG_TAG,"Creating output Bitmap");
         mImageOut = mCompareFrame.clone();
-        Features2d.drawKeypoints(mCompareFrame, mKpCompare,mImageOut);
+        Features2d.drawKeypoints(mCompareFrame, mKpCompare, mImageOut);
         mFinalImage = Bitmap.createBitmap(mImageOut.cols(), mImageOut.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mImageOut, mFinalImage);
     }
 
     public Thread getCurrentThread(){
+        Log.d(LOG_TAG,"Returning this thread");
         return mThisThread;
     }
     public void cleanup(){
+        Log.d(LOG_TAG,"Cleaning up");
         mFinalImage = null;
         mCompareFrame = null;
         mPrimeDesc = null;

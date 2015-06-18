@@ -37,7 +37,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class CounterActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2{
     static{ System.loadLibrary("opencv_java"); }
-    private static final String LOG_TAG = "RepCounter:Counter";
+    private static final String LOG_TAG = "CounterActivity";
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -53,7 +53,7 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
     private TextView mCountdownTimerText;
     private GetReadyTimer mTimer;
 
-    private MediaPlayer mp;
+    private MediaPlayer mPlayer;
     Intent mIntent;
 
     private int mFrameCount = 0;
@@ -68,7 +68,7 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        initAudioPlayer();
+        mPlayer = MediaPlayer.create(this, R.raw.cd_beep);
 
         mIntent = getIntent();
         mMatcherManager = MatcherManager.getInstance();
@@ -148,6 +148,7 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat frame = inputFrame.gray();
         if(isRunning) {
+            Log.d(LOG_TAG,"Matching started to run.");
             if(null == mMatcherManager.getPrimeFrame()){
                 mMatcherManager.setPrimeFrame(frame);
             }
@@ -224,7 +225,7 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
         }
         @Override
         public void onTick(long l) {
-            mp.start();
+            mPlayer.start();
             mCountdownTimerText.setText(String.valueOf(l/1000));
         }
 
@@ -232,35 +233,6 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
         public void onFinish() {
             mCountdownTimerText.setVisibility(View.GONE);
             startMatching();
-        }
-    }
-
-    public void initAudioPlayer(){
-        //set up MediaPlayer
-        mp = new MediaPlayer();
-
-        try {
-            AssetFileDescriptor afd = getAssets().openFd("cd_beep.mp3");
-            mp.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            afd.close();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        try {
-            mp.prepare();
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 }

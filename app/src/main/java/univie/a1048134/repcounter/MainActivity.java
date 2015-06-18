@@ -22,7 +22,7 @@ import org.opencv.android.LoaderCallbackInterface;
 
 
 public class MainActivity extends Activity{
-    private static final String LOG_TAG = "RepCounter:Main";
+    private static final String LOG_TAG = "MainActivity";
 
     Resources res;
 
