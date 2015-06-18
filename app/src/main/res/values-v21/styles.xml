@@ -10,4 +10,12 @@
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
+
+    <style name="mySpinner" parent="android:Widget.Material.Spinner">
+        <item name="android:layout_marginBottom">10dp</item>
+
+    </style>
+    <style name="myTextView" parent="android:Widget.Material.TextView">
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
 </resources>

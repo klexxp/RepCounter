@@ -56,6 +56,8 @@ public class MainActivity extends Activity{
                 intent.putExtra("Detector", mSelectedDetector);
                 intent.putExtra("Matcher", mSelectedMatcher);
                 intent.putExtra("Countdown", mSelectedCountdown);
+                intent.putExtra("Distance",((TextView)findViewById(R.id.minDist_chooser)).getText());
+                intent.putExtra("Matches",((TextView)findViewById(R.id.matchThres_chooser)).getText());
                 startActivity(intent);
             }
         });
@@ -120,17 +122,19 @@ public class MainActivity extends Activity{
         });
 
         // Countdown Spinner
-
+        final String[] ints = {"1","3","5","10","15"};
+        ArrayAdapter<String> countdownAdapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_dropdown_item, ints
+        );
         countdownSpinner = (Spinner) findViewById(R.id.countdown_spinner);
-        final int[] items = new int[]{1,5,10,15,30};
-        ArrayAdapter<int[]> times = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
-        //times.add(items);
-        countdownSpinner.setAdapter(times);
+
+        countdownSpinner.setAdapter(countdownAdapter);
 
         countdownSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                mSelectedCountdown = items[countdownSpinner.getSelectedItemPosition()];
+                String value = countdownSpinner.getSelectedItem().toString();
+                mSelectedCountdown = Integer.valueOf(value);
             }
 
             @Override

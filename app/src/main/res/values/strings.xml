@@ -12,6 +12,10 @@
     <string name="repetition_count_label">Repetition Count:</string>
     <string name="repetition_count_text">0</string>
     <string name="countdown_text">Countdown Length</string>
+    <string name="minDist_text">Minimum Distance</string>
+    <string name="matchThres_text">Match Threshold</string>
+    <string name="minDist_hint">0.5 - 1.0</string>
+    <string name="match_hint">250 - 500</string>
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_counter">CounterActivity</string>

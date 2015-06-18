@@ -101,29 +101,5 @@ public class MatcherManager {
         mFrameMatcherThreadPool.execute(frameMatcher);
     }
 
-    /*public void cancelAll(){
-        /*
-         * Creates an array of tasks that's the same size as the task work queue
-
-        FrameMatcher[] taskArray = new FrameMatcher[mFrameMatcherQueue.size()];
-        // Populates the array with the task objects in the queue
-        mFrameMatcherQueue.toArray(taskArray);
-        // Stores the array length in order to iterate over the array
-        int taskArraylen = taskArray.length;
-        /*
-         * Locks on the singleton to ensure that other processes aren't mutating Threads, then
-         * iterates over the array of tasks and interrupts the task's current Thread.
-         
-        synchronized (this) {
-            // Iterates over the array of tasks
-            for (int taskArrayIndex = 0; taskArrayIndex < taskArraylen; taskArrayIndex++) {
-                // Gets the task's current thread
-                Thread thread = taskArray[taskArrayIndex].;
-                // if the Thread exists, post an interrupt to it
-                if (null != thread) {
-                    thread.interrupt();
-                }
-            }
-        }
-    }*/
+    public void cancelAll(){}
 }
