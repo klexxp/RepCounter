@@ -1,0 +1,82 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="univie.a1048134.repcounter.MainActivity"
+    android:padding="10dp">
+
+    <!-- OpenCV manager status -->
+        <TextView
+            android:id="@+id/opencvManagerStatusText"
+            android:text="@string/opencvManagerStatus_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:paddingBottom="10dp"/>
+        <TextView
+            android:id="@+id/opencvManagerStatus"
+            android:text="@string/opencvManagerStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            android:layout_toEndOf="@id/opencvManagerStatusText"
+            android:layout_alignParentTop="true"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp" />
+    <!-- Detectors Spinner -->
+        <TextView
+            android:id="@+id/detectors_text"
+            android:text="@string/detectors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/opencvManagerStatusText"
+            android:layout_centerVertical="true"/>
+        <Spinner
+            android:id="@+id/detectors_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            android:layout_toEndOf="@id/detectors_text"
+            android:layout_alignTop="@id/detectors_text" />
+    <!--Matchers spinner -->
+        <TextView
+            android:id="@+id/matchers_text"
+            android:text="@string/matchers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/detectors_spinner"
+            android:gravity="center_vertical"/>
+        <Spinner
+            android:id="@+id/matchers_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            android:layout_toEndOf="@id/matchers_text"
+            android:layout_below="@id/detectors_spinner"
+            android:gravity="center"/>
+    <!-- Countdown spinner -->
+        <TextView
+            android:id="@+id/countdown_text"
+            android:text="@string/countdown_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/matchers_spinner"
+            android:layout_alignParentStart="true"/>
+        <Spinner
+            android:id="@+id/countdown_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/matchers_spinner"
+            android:layout_toEndOf="@id/countdown_text"/>
+    <!-- Start button -->
+        <Button
+            android:id="@+id/start_button"
+            android:text="@string/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
