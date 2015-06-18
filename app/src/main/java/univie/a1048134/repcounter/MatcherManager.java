@@ -72,6 +72,7 @@ public class MatcherManager {
                 mCount = mCount + result;
                 Message msg = mHandler.obtainMessage(FrameMatcher.MATCHING_COMPLETE, image);
                 msg.sendToTarget();
+                matcher.cleanup();
                 mFrameMatcherQueue.offer(matcher);
                 break;
             default:
@@ -91,15 +92,24 @@ public class MatcherManager {
 
     public void matchToFrame(Mat frame){
         FrameMatcher frameMatcher = (FrameMatcher) sInstance.mFrameMatcherQueue.poll();
-
         if(null == frameMatcher){
             frameMatcher = new FrameMatcher();
         }
-
         frameMatcher.initialize(MatcherManager.sInstance, mPrimeFrame, frame);
-
         mFrameMatcherThreadPool.execute(frameMatcher);
     }
 
-    public void cancelAll(){}
+    public void cancelAll(){
+        FrameMatcher[] matcherArray = new FrameMatcher[sInstance.mFrameMatcherQueue.size()];
+        sInstance.mFrameMatcherQueue.toArray(matcherArray);
+        int taskArraylen = matcherArray.length;
+        synchronized (sInstance) {
+            for (int taskArrayIndex = 0; taskArrayIndex < taskArraylen; taskArrayIndex++) {
+                Thread thread = matcherArray[taskArrayIndex].getCurrentThread();
+                if (null != thread) {
+                    thread.interrupt();
+                }
+            }
+        }
+    }
 }

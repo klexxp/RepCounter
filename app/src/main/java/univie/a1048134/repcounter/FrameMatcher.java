@@ -27,7 +27,6 @@ public class FrameMatcher implements Runnable {
     static final int MATCHING_COMPLETE = 0;
     private static final double sThreshold = 0.75;
 
-    private Mat mPrimeFrame;
     private Mat mPrimeDesc = null;
     private MatOfKeyPoint mKpPrime = null;
 
@@ -35,11 +34,14 @@ public class FrameMatcher implements Runnable {
     private Mat mCompareDesc = null;
     private MatOfKeyPoint mKpCompare = null;
 
+    private Mat mImageOut;
     private Bitmap mFinalImage;
 
     private DescriptorMatcher mMatcher;
 
     private static MatcherManager mManager;
+
+    private Thread mThisThread;
 
     private int mResult = 0;
     private int mMinDistance = 10;
@@ -47,8 +49,8 @@ public class FrameMatcher implements Runnable {
 
     public void initialize(MatcherManager manager, Mat primeFrame, Mat compareFrame){
         mManager = manager;
+        mThisThread = Thread.currentThread();
 
-        mPrimeFrame = primeFrame;
         mCompareFrame = compareFrame;
 
         mKpPrime = Extractor.calcKeypoints(primeFrame);
@@ -109,6 +111,7 @@ public class FrameMatcher implements Runnable {
             try{
                 Thread.sleep(SLEEP_TIME_MILLISECONDS);
             }catch(java.lang.InterruptedException interruptException){
+                return;
             }
         }finally{
             createBitmap();
@@ -118,11 +121,24 @@ public class FrameMatcher implements Runnable {
     }
 
     private void  createBitmap(){
-        Mat imageOut = mCompareFrame.clone();
-        Features2d.drawKeypoints(mCompareFrame, mKpCompare,imageOut);
-        Bitmap resultBitmap = Bitmap.createBitmap(imageOut.cols(), imageOut.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(imageOut, resultBitmap);
+        mImageOut = mCompareFrame.clone();
+        Features2d.drawKeypoints(mCompareFrame, mKpCompare,mImageOut);
+        mFinalImage = Bitmap.createBitmap(mImageOut.cols(), mImageOut.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(mImageOut, mFinalImage);
+    }
 
-        mFinalImage = resultBitmap;
+    public Thread getCurrentThread(){
+        return mThisThread;
+    }
+    public void cleanup(){
+        mFinalImage = null;
+        mCompareFrame = null;
+        mPrimeDesc = null;
+        mCompareDesc = null;
+        mKpCompare = null;
+        mKpPrime = null;
+        mManager = null;
+        mMatcher = null;
+        mImageOut = null;
     }
 }
