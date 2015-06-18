@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="q_green">#008000</color>
+    <color name="red">#FF0000</color>
+
+    <style name="CountDownText" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">64sp</item>
+        <item name="android:textColor">@color/red</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+</resources>
