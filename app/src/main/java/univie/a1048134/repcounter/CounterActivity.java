@@ -3,6 +3,8 @@ package univie.a1048134.repcounter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -24,45 +26,49 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+import org.opencv.features2d.FeatureDetector;
+import org.opencv.features2d.Features2d;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.video.BackgroundSubtractorMOG;
+import org.opencv.video.BackgroundSubtractorMOG2;
 
 import java.io.IOException;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class CounterActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2{
     static{ System.loadLibrary("opencv_java"); }
+
     private static final String LOG_TAG = "CounterActivity";
+    private MatcherManager mMatcherManager;
+
+    private boolean isRunning = false;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
-    private Button mControlButton;
-
-    private MatcherManager mMatcherManager;
-    private Handler mHandler;
-    View mCounterView;
-
-    private TextView mCountText;
-    private boolean isRunning = false;
-
     private TextView mCountdownTimerText;
+    private Button mControlButton;
+    private Button mToggleButton;
+
     private GetReadyTimer mTimer;
-
     private MediaPlayer mPlayer;
-    Intent mIntent;
-
-    private int mFrameCount = 0;
 
     @Override
     protected void onCreate(Bundle stateBundle) {
         super.onCreate(stateBundle);
-        mCounterView = getLayoutInflater().inflate(R.layout.activity_counter, null);
-        setContentView(mCounterView);
+        setContentView(R.layout.activity_counter);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.openCvCameraView);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -70,42 +76,61 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
 
         mPlayer = MediaPlayer.create(this, R.raw.cd_beep);
 
-        mIntent = getIntent();
-        mMatcherManager = MatcherManager.getInstance();
-        mMatcherManager.passView(findViewById(R.id.frameView));
+        Bundle settings = getIntent().getExtras();
 
-        mTimer = new GetReadyTimer(10000, 1000);
+        String detector = settings.getString("Detector");
+        String extractor = settings.getString("Extractor");
+        String matcher = settings.getString("Matcher");
+        Double distance = settings.getDouble("Distance");
+        int matches = settings.getInt("Matches");
+        int preFrames = settings.getInt("PreFrames");
+        int countdown = settings.getInt("Countdown");
+
+        mMatcherManager = new MatcherManager((ImageView) findViewById(R.id.primeView), (ImageView) findViewById(R.id.compareView), (TextView) findViewById(R.id.repetition_count), (TextView) findViewById(R.id.average), detector, extractor, matcher, distance, matches, preFrames);
+
+        mTimer = new GetReadyTimer(countdown * 1000, 1000);
         mCountdownTimerText = (TextView) findViewById(R.id.countdownTimer_text);
-
-        mCountText = (TextView) findViewById(R.id.repetition_count);
 
         mControlButton = (Button) findViewById(R.id.control_button);
         mControlButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!isRunning){
-                    (findViewById(R.id.control_button)).setBackgroundResource(R.drawable.start_button_pressed);
+                    mControlButton.setBackgroundResource(R.drawable.stop);
                     mCountdownTimerText.setText("10");
                     mCountdownTimerText.setVisibility(View.VISIBLE);
                     mTimer.start();
                 }else{
-                    stopMatching();
+                    isRunning = false;
+                    mTimer.cancel();
+                    (findViewById(R.id.control_button)).setBackgroundResource(R.drawable.play);
                 }
             }
         });
 
-        mHandler = new Handler(Looper.getMainLooper()){
+        mToggleButton = (Button) findViewById(R.id.toggleKp_button);
+        mToggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void handleMessage(Message message){
-                mCountText.setText(String.valueOf(message.what));
+            public void onClick(View view) {
+                mMatcherManager.toggleKeypoints();
             }
-        };
+        });
+
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+
+        if(isRunning) {
+            mMatcherManager.handleFrame(inputFrame.rgba());
+            Log.d(LOG_TAG, "matching is running");
+        }
+
+        return inputFrame.rgba();
     }
 
     public void onResume(){
         super.onResume();
-
-        mFrameCount = 0;
 
         if(!OpenCVLoader.initDebug()){
             Log.d(LOG_TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization.");
@@ -122,9 +147,6 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
         if(mOpenCvCameraView != null){
             mOpenCvCameraView.disableView();
         }
-        if(mMatcherManager != null){
-            mMatcherManager.cancelAll();
-        }
     }
 
     @Override
@@ -133,33 +155,11 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
         if(mOpenCvCameraView != null){
             mOpenCvCameraView.disableView();
         }
-        if(mMatcherManager != null){
-            mMatcherManager.cancelAll();
-        }
     }
 
     @Override
     protected void onStop() {
-        mMatcherManager.cancelAll();
         super.onStop();
-    }
-
-    @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Mat frame = inputFrame.gray();
-        if(isRunning) {
-            Log.d(LOG_TAG,"Matching started to run.");
-            if(null == mMatcherManager.getPrimeFrame()){
-                mMatcherManager.setPrimeFrame(frame);
-            }
-            if(mFrameCount % 25 == 0) {
-                mMatcherManager.matchToFrame(frame);
-            }
-            int count = mMatcherManager.getCount();
-            mHandler.sendEmptyMessage(count);
-        }
-        mFrameCount++;
-        return inputFrame.rgba();
     }
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -171,22 +171,25 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
                     Log.i(LOG_TAG, "OpenCV loaded successfully.");
                     mOpenCvCameraView.enableView();
                 } break;
+                case LoaderCallbackInterface.INIT_FAILED:
+                    Log.i(LOG_TAG,"Init Failed");
+                    break;
+                case LoaderCallbackInterface.INSTALL_CANCELED:
+                    Log.i(LOG_TAG,"Install Cancelled");
+                    break;
+                case LoaderCallbackInterface.INCOMPATIBLE_MANAGER_VERSION:
+                    Log.i(LOG_TAG,"Incompatible Version");
+                    break;
+                case LoaderCallbackInterface.MARKET_ERROR:
+                    Log.i(LOG_TAG,"Market Error");
+                    break;
                 default:
-                {
+                    Log.i(LOG_TAG,"OpenCV Manager Install");
                     super.onManagerConnected(status);
-                } break;
+                    break;
             }
         }
     };
-
-    private void startMatching(){
-        isRunning = true;
-    }
-
-    private void stopMatching(){
-        isRunning = false;
-        mMatcherManager.cancelAll();
-    }
 
     @Override
     public void onCameraViewStarted(int width, int height) {}
@@ -200,8 +203,6 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
         getMenuInflater().inflate(R.menu.menu_counter, menu);
         return true;
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -232,7 +233,7 @@ public class CounterActivity extends Activity implements CameraBridgeViewBase.Cv
         @Override
         public void onFinish() {
             mCountdownTimerText.setVisibility(View.GONE);
-            startMatching();
+            isRunning = true;
         }
     }
 }

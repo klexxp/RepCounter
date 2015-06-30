@@ -1,125 +1,176 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="univie.a1048134.repcounter.MainActivity"
-    android:padding="10dp">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context="univie.a1048134.repcounter.MainActivity">
 
-    <!-- OpenCV manager status -->
-    <TextView
-        android:id="@+id/opencvManagerStatusText"
-        android:text="@string/opencvManagerStatus_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
-    <TextView
-        android:id="@+id/opencvManagerStatus"
-        android:text="@string/opencvManagerStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/red"
-        android:layout_toEndOf="@id/opencvManagerStatusText"
-        android:layout_alignParentTop="true"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        style="@style/myTextView" />
-    <!-- Detectors Spinner -->
-    <TextView
-        android:id="@+id/detectors_text"
-        android:text="@string/detectors"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/opencvManagerStatusText"
-        style="@style/myTextView" />
-    <Spinner
-        android:id="@+id/detectors_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:spinnerMode="dropdown"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/detectors_text"
-        android:layout_alignTop="@id/detectors_text"
-        style="@style/mySpinner" />
-    <!--Matchers spinner -->
-    <TextView
-        android:id="@+id/matchers_text"
-        android:text="@string/matchers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/detectors_spinner"
-        style="@style/myTextView" />
-    <Spinner
-        android:id="@+id/matchers_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:spinnerMode="dropdown"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/matchers_text"
-        android:layout_alignTop="@id/matchers_text"
-        style="@style/mySpinner" />
-    <!-- Minimum Distance -->
-    <TextView
-        android:text="@string/minDist_text"
-        android:id="@+id/minDist_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/matchers_spinner"
-        android:layout_alignParentStart="true"
-        style="@style/myTextView" />
-    <EditText
-        android:id="@+id/minDist_chooser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:hint="@string/minDist_hint"
-        android:layout_below="@id/minDist_text"
-        android:layout_alignParentStart="true" />
-    <!-- Match Threshold -->
-    <TextView
-        android:id="@+id/matchThres_text"
-        android:text="@string/matchThres_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/minDist_chooser"
-        android:layout_alignParentStart="true"
-        style="@style/myTextView" />
-    <EditText
-        android:id="@+id/matchThres_chooser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:hint="@string/match_hint"
-        android:layout_below="@id/matchThres_text"
-        android:layout_alignParentStart="true" />
-    <!-- Countdown spinner -->
-    <TextView
-        android:id="@+id/countdown_text"
-        android:text="@string/countdown_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/matchThres_chooser"
-        android:layout_alignParentStart="true"
-        style="@style/myTextView" />
-    <Spinner
-        android:id="@+id/countdown_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/countdown_text"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/countdown_text"
-        style="@style/mySpinner" />
-    <!-- Start button -->
-    <Button
-        android:id="@+id/start_button"
-        android:text="@string/start_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
-</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <!-- OpenCV manager status -->
+        <TextView
+            android:id="@+id/heading.opencvStatus"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/heading.opencvStatus"
+            style="?android:listSeparatorTextViewStyle"
+            />
+        <TextView
+            android:id="@+id/text.opencvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/heading.opencvStatus"
+            style="@style/opencvManagerStatus"
+            />
+        <!-- Image Feature Methods -->
+        <TextView
+            android:id="@+id/heading.featureMethods"
+            android:text="@string/heading_featureMethods"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/text.opencvStatus"
+            style="?android:listSeparatorTextViewStyle"
+            />
+        <!-- Detectors Spinner -->
+        <TextView
+            android:id="@+id/text_detector"
+            android:text="@string/detectors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/heading_featureMethods"
+            style="@style/myTextView" />
+        <Spinner
+            android:id="@+id/spinner_detector"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            android:layout_below="@id/text_detector"
+            style="@style/mySpinner" />
+        <!--Matchers spinner -->
+        <TextView
+            android:id="@+id/text_matcher"
+            android:text="@string/matchers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/spinner_detector"
+            style="@style/myTextView" />
+        <Spinner
+            android:id="@+id/spinner_matcher"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            android:layout_below="@id/text_matcher"
+            style="@style/mySpinner" />
+        <!-- Image Feature Methods -->
+        <TextView
+            android:id="@+id/heading_params"
+            android:text="@string/heading_params"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/matchers_spinner"
+            style="?android:listSeparatorTextViewStyle"
+            />
+        <!-- Minimum Distance -->
+        <TextView
+            android:text="@string/minDist_text"
+            android:id="@+id/minDist_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/heading_params"
+            android:layout_alignParentStart="true"
+            style="@style/myTextView" />
+        <EditText
+            android:id="@+id/minDist_chooser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="8"
+            android:hint="@string/minDist_hint"
+            android:layout_below="@id/minDist_text"
+            android:layout_alignParentStart="true"
+            style="@style/myEditText"
+            />
+        <!-- Match Threshold -->
+        <TextView
+            android:id="@+id/matchThres_text"
+            android:text="@string/matchThres_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/minDist_chooser"
+            android:layout_alignParentStart="true"
+            style="@style/myTextView" />
+        <EditText
+            android:id="@+id/matchThres_chooser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="8"
+            android:hint="@string/match_hint"
+            android:layout_below="@id/matchThres_text"
+            android:layout_alignParentStart="true"
+            style="@style/myEditText"
+            />
+        <!-- Pre frames -->
+        <TextView
+            android:id="@+id/preFrames_text"
+            android:text="@string/preFrames_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/matchThres_chooser"
+            android:layout_alignParentStart="true"
+            style="@style/myTextView" />
+        <EditText
+            android:id="@+id/preFrames_chooser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="8"
+            android:hint="@string/preFrames_hint"
+            android:layout_below="@id/preFrames_text"
+            android:layout_alignParentStart="true"
+            style="@style/myEditText"
+            />
+        <!-- Countdown -->
+        <TextView
+            android:id="@+id/heading_settings"
+            android:text="@string/heading_settings"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/preFrames_chooser"
+            style="?android:listSeparatorTextViewStyle"
+            />
+        <!-- Countdown spinner -->
+        <TextView
+            android:id="@+id/countdown_text"
+            android:text="@string/countdown_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/heading_settings"
+            android:layout_alignParentStart="true"
+            style="@style/myTextView" />
+        <Spinner
+            android:id="@+id/countdown_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/countdown_text"
+            style="@style/mySpinner" />
+
+        <!-- Start button -->
+        <Button
+            android:id="@+id/start_button"
+            android:text="@string/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/countdown_spinner"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+</ScrollView>

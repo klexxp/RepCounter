@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -24,18 +27,19 @@ import org.opencv.android.LoaderCallbackInterface;
 public class MainActivity extends Activity{
     private static final String LOG_TAG = "MainActivity";
 
-    Resources res;
-
     Spinner detectorSpinner;
     Spinner matcherSpinner;
     Spinner countdownSpinner;
+
+    EditText distance_input;
+    EditText minMatches_input;
+    EditText preFrames_input;
 
     String mSelectedMatcher;
     String mSelectedDetector;
     int mSelectedCountdown;
 
     TextView mOpencvManagerStatus;
-
     Button mStartButton;
 
     @Override
@@ -43,22 +47,33 @@ public class MainActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        res = getResources();
+        final EditText distance_chooser = (EditText) findViewById(R.id.minDist_chooser);
+        final EditText matches_chooser = (EditText) findViewById(R.id.matchThres_chooser);
+        final EditText preFrames_chosser = (EditText) findViewById(R.id.preFrames_chooser);
+
         populateSpinners();
 
-        mOpencvManagerStatus = (TextView) findViewById(R.id.opencvManagerStatus);
+        mOpencvManagerStatus = (TextView) findViewById(R.id.text_opencvStatus);
 
         mStartButton = (Button) findViewById(R.id.start_button);
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, CounterActivity.class);
-                intent.putExtra("Detector", mSelectedDetector);
-                intent.putExtra("Matcher", mSelectedMatcher);
-                intent.putExtra("Countdown", mSelectedCountdown);
-                intent.putExtra("Distance",((TextView)findViewById(R.id.minDist_chooser)).getText());
-                intent.putExtra("Matches",((TextView)findViewById(R.id.matchThres_chooser)).getText());
-                startActivity(intent);
+            Intent intent = new Intent(MainActivity.this, CounterActivity.class);
+            Bundle settings = new Bundle();
+
+            settings.putString("Detector", mSelectedDetector);
+            settings.putString("Matcher", mSelectedMatcher);
+
+            settings.putDouble("Distance", Double.valueOf(distance_chooser.getText().toString()));
+            settings.putInt("Matches", Integer.valueOf(matches_chooser.getText().toString()));
+
+            settings.putInt("PreFrames", Integer.valueOf(preFrames_chosser.getText().toString()));
+
+            settings.putInt("Countdown", mSelectedCountdown);
+
+            intent.putExtras(settings);
+            startActivity(intent);
             }
         });
     }
@@ -68,10 +83,11 @@ public class MainActivity extends Activity{
         super.onResume();
         boolean installed = appInstalledOrNot("org.opencv.engine");
         if(installed) {
-            mOpencvManagerStatus.setText("YES");
-            mOpencvManagerStatus.setTextColor(res.getColor(R.color.green));
+            mOpencvManagerStatus.setTextColor(getResources().getColor(R.color.green));
+            mOpencvManagerStatus.setText(R.string.text_opencvStatusInstalled);
             System.out.println("OpenCV Manager is installed.");
         } else {
+            mOpencvManagerStatus.setText(R.string.text_opencvStatusNotInstalled);
             System.out.println("OpenCV Manager is not installed.");
         }
     }
@@ -86,9 +102,7 @@ public class MainActivity extends Activity{
 
         detectorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         detectorSpinner.setAdapter(detectorAdapter);
-
         mSelectedDetector = detectorSpinner.getSelectedItem().toString();
-
         detectorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -106,9 +120,7 @@ public class MainActivity extends Activity{
 
         matcherAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         matcherSpinner.setAdapter(matcherAdapter);
-
         mSelectedMatcher = matcherSpinner.getSelectedItem().toString();
-
         matcherSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -127,14 +139,12 @@ public class MainActivity extends Activity{
                 this, android.R.layout.simple_spinner_dropdown_item, ints
         );
         countdownSpinner = (Spinner) findViewById(R.id.countdown_spinner);
-
+        countdownSpinner.setSelection(3);
         countdownSpinner.setAdapter(countdownAdapter);
-
         countdownSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String value = countdownSpinner.getSelectedItem().toString();
-                mSelectedCountdown = Integer.valueOf(value);
+                mSelectedCountdown = Integer.valueOf(ints[i]);
             }
 
             @Override

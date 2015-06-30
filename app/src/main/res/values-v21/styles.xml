@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <color name="q_green">#008000</color>
-    <color name="red">#FF0000</color>
+    <style name="myTheme" parent="android:Theme.Material">
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
     <style name="CountDownText" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">64sp</item>
@@ -12,10 +12,26 @@
     </style>
 
     <style name="mySpinner" parent="android:Widget.Material.Spinner">
-        <item name="android:layout_marginBottom">10dp</item>
-
+        <item name="android:layout_marginStart">25dp</item>
+        <item name="android:layout_marginEnd">30dp</item>
     </style>
+
     <style name="myTextView" parent="android:Widget.Material.TextView">
         <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+    </style>
+
+    <style name="myEditText" parent="android:Widget.Material.EditText">
+        <item name="android:layout_marginStart">30dp</item>
+    </style>
+
+    <style name="opencvManagerStatus" parent="android:Widget.Material.TextView">
+        <item name="android:color">@color/red</item>
+        <item name="android:text">@string/text_opencvStatusInstalled</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="android:paddingTop">15dp</item>
     </style>
 </resources>
